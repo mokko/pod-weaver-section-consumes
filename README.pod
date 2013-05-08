@@ -4,7 +4,7 @@ Pod::Weaver::Section::Consumes - Add a list of roles to your POD.
 
 =head1 VERSION
 
-version 0.007
+version 0.0082
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ Mike Friedman <friedo@friedo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Mike Friedman.
+This software is copyright (c) 2013 by Mike Friedman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
