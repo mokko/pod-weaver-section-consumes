@@ -1,4 +1,7 @@
 package Pod::Weaver::Section::Consumes;
+{
+  $Pod::Weaver::Section::Consumes::VERSION = '0.0082';
+}
 
 use strict;
 use warnings;
@@ -84,7 +87,17 @@ sub _get_roles {
 
 1;
 
+
+__END__
 =pod
+
+=head1 NAME
+
+Pod::Weaver::Section::Consumes - Add a list of roles to your POD.
+
+=head1 VERSION
+
+version 0.0082
 
 =head1 SYNOPSIS
 
@@ -100,7 +113,16 @@ this by attempting to compile your class and interrogating its metaclass object.
 
 Classes which do not have a C<meta> method will be skipped.
 
+=head1 AUTHOR
 
+Mike Friedman <friedo@friedo.com>
 
- 
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mike Friedman.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 
