@@ -30,6 +30,7 @@ sub weave_section {
     #print "module:$module\n";
     unshift @INC, './lib';
     eval { load $module };    #use full path for require
+    @INC = @ORIG_INC;
     print "$@" if $@;
 
     return unless $module->can('meta');
@@ -84,8 +85,6 @@ sub _get_roles {
     #print "@roles\n";
     return @roles;
 }
-
-sub DEMOLISH { @INC = @ORIG_INC }
 
 __PACKAGE__->meta->make_immutable;
 1;
