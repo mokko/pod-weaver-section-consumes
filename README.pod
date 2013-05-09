@@ -20,6 +20,8 @@ this by attempting to compile your class and interrogating its metaclass object.
 
 Classes which do not have a C<meta> method will be skipped.
 
+It rewrites pod only for *.pm files in lib.
+
 =head1 AUTHOR
 
 Mike Friedman <friedo@friedo.com>
