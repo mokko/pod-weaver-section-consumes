@@ -1,41 +1,41 @@
 package Pod::Weaver::Section::Consumes;
 {
-  $Pod::Weaver::Section::Consumes::VERSION = '0.0082';
+  $Pod::Weaver::Section::Consumes::VERSION = '0.0083';
 }
+
+# ABSTRACT: Add a list of roles to your POD.
 
 use strict;
 use warnings;
 use Module::Load;
-use lib './lib';    #instead messing with INC
-
-# ABSTRACT: Add a list of roles to your POD.
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
 use aliased 'Pod::Elemental::Element::Nested';
 use aliased 'Pod::Elemental::Element::Pod5::Command';
+my @ORIG_INC = @INC;
 
 sub weave_section {
     my ( $self, $doc, $input ) = @_;
 
-    my $filename = $input->{filename};    #full rel path
-    return unless $filename =~ m{^lib/};
+    my $filename = $input->{filename};
+    #consumes section is written only for lib/*.pm and for one package pro file
+    return if $filename !~ m{^lib};
+    return if $filename !~ m{\.pm$};
 
-    # works only if one package pro file
-    my $inc_filename = $filename;         #as in %INC's keys
-    $inc_filename =~ s{^lib/}{};          # assume modules live under lib
-    my $module = $inc_filename;
+    my $module = $filename;
+    $module =~ s{^lib/}{}; #will there be a backslash on win32?
     $module =~ s{/}{::}g;
-    $module =~ s{\.\w+$}{};
-
-    eval { load $inc_filename };
+    $module =~ s{\.pm$}{};
+    #print "module:$module\n";
+    unshift @INC, './lib';
+    eval { load $module };    #use full path for require
     print "$@" if $@;
-    #print map {"$_\n"} sort keys %INC;
 
     return unless $module->can('meta');
     my @roles = sort
       grep { $_ ne $module }
-      map  { $_->name } $self->_get_roles($module);
+      $self->_get_roles($module);
     return unless @roles;
 
     my @pod = (
@@ -79,12 +79,15 @@ sub weave_section {
 
 sub _get_roles {
     my ( $self, $module ) = @_;
-
-    my @roles = eval { $module->meta->calculate_all_roles };
+    my @roles =  map  { $_->name } eval { $module->meta->calculate_all_roles };
     print "Possibly harmless: $@" if $@;
+    #print "@roles\n";
     return @roles;
 }
 
+sub DEMOLISH { @INC = @ORIG_INC }
+
+__PACKAGE__->meta->make_immutable;
 1;
 
 
@@ -97,7 +100,7 @@ Pod::Weaver::Section::Consumes - Add a list of roles to your POD.
 
 =head1 VERSION
 
-version 0.0082
+version 0.0083
 
 =head1 SYNOPSIS
 
