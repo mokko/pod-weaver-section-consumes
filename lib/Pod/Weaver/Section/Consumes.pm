@@ -10,30 +10,28 @@ with 'Pod::Weaver::Role::Section';
 
 use aliased 'Pod::Elemental::Element::Nested';
 use aliased 'Pod::Elemental::Element::Pod5::Command';
-my @ORIG_INC = @INC;
 
 sub weave_section {
     my ( $self, $doc, $input ) = @_;
 
     my $filename = $input->{filename};
+
     #consumes section is written only for lib/*.pm and for one package pro file
     return if $filename !~ m{^lib};
     return if $filename !~ m{\.pm$};
 
     my $module = $filename;
-    $module =~ s{^lib/}{}; #will there be a backslash on win32?
+    $module =~ s{^lib/}{};    #will there be a backslash on win32?
     $module =~ s{/}{::}g;
     $module =~ s{\.pm$}{};
+
     #print "module:$module\n";
-    unshift @INC, './lib';
-    eval { load $module };    #use full path for require
-    @INC = @ORIG_INC;
+    eval { local @INC = ( 'lib', @INC ); load $module }; 
     print "$@" if $@;
 
     return unless $module->can('meta');
     my @roles = sort
-      grep { $_ ne $module }
-      $self->_get_roles($module);
+      grep { $_ ne $module } $self->_get_roles($module);
     return unless @roles;
 
     my @pod = (
@@ -77,8 +75,9 @@ sub weave_section {
 
 sub _get_roles {
     my ( $self, $module ) = @_;
-    my @roles =  map  { $_->name } eval { $module->meta->calculate_all_roles };
+    my @roles = map { $_->name } eval { $module->meta->calculate_all_roles };
     print "Possibly harmless: $@" if $@;
+
     #print "@roles\n";
     return @roles;
 }
