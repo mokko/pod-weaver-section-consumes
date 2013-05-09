@@ -24,6 +24,7 @@ my %module_build_args = (
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
+    "Class::Unload" => 0,
     "Module::Load" => 0,
     "Moose" => 0,
     "Pod::Elemental::Element::Nested" => 0,

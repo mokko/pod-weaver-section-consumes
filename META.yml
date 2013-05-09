@@ -8,13 +8,14 @@ configure_requires:
   ExtUtils::MakeMaker: 6.30
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Pod-Weaver-Section-Consumes
 requires:
+  Class::Unload: 0
   Module::Load: 0
   Moose: 0
   Pod::Elemental::Element::Nested: 0

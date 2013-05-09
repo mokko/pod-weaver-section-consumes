@@ -8,6 +8,7 @@ package Pod::Weaver::Section::Consumes;
 use strict;
 use warnings;
 use Module::Load;
+use Class::Unload;
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
@@ -35,6 +36,9 @@ sub weave_section {
     return unless $module->can('meta');
     my @roles = sort
       grep { $_ ne $module } $self->_get_roles($module);
+    #leave prestine environment for listdeps; 
+    #I don't think that should be necessary, we sure loose time here.
+    Class::Unload->unload( $module );
     return unless @roles;
 
     my @pod = (

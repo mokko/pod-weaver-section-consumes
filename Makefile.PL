@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Pod::Weaver::Section::Consumes",
   "PREREQ_PM" => {
+    "Class::Unload" => 0,
     "Module::Load" => 0,
     "Moose" => 0,
     "Pod::Elemental::Element::Nested" => 0,
