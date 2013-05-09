@@ -4,8 +4,9 @@ package Pod::Weaver::Section::Consumes;
 
 use strict;
 use warnings;
+
+use Class::Inspector;
 use Module::Load;
-use Class::Unload;
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
@@ -18,24 +19,26 @@ sub weave_section {
     my $filename = $input->{filename};
 
     #consumes section is written only for lib/*.pm and for one package pro file
+    #see Pod::Weaver::Section::ClassMopper for an alternative way
     return if $filename !~ m{^lib};
     return if $filename !~ m{\.pm$};
 
     my $module = $filename;
-    $module =~ s{^lib/}{};    #will there be a backslash on win32?
+    $module =~ s{^lib/}{};
     $module =~ s{/}{::}g;
     $module =~ s{\.pm$}{};
 
-    #print "module:$module\n";
-    eval { local @INC = ( 'lib', @INC ); load $module }; 
-    print "$@" if $@;
+    print "module:$module\n";
+
+    if ( !Class::Inspector->loaded($module) ) {
+        eval { local @INC = ( 'lib', @INC ); Module::Load::load $module };
+        print "$@" if $@;    #warn
+    }
 
     return unless $module->can('meta');
     my @roles = sort
       grep { $_ ne $module } $self->_get_roles($module);
-    #leave prestine environment for listdeps; 
-    #I don't think that should be necessary, we sure loose time here.
-    Class::Unload->unload( $module );
+
     return unless @roles;
 
     my @pod = (
@@ -87,6 +90,7 @@ sub _get_roles {
 }
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 1;
 
 =pod
@@ -105,7 +109,4 @@ this by attempting to compile your class and interrogating its metaclass object.
 
 Classes which do not have a C<meta> method will be skipped.
 
-
-
- 
-
+It rewrites pod only for *.pm files in lib.
