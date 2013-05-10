@@ -19,7 +19,7 @@ sub weave_section {
     my $filename = $input->{filename};
 
     #consumes section is written only for lib/*.pm and for one package pro file
-    #see Pod::Weaver::Section::ClassMopper for an alternative way
+    #see Pod::Weaver::Section::ClassMopper for an alternative
     return if $filename !~ m{^lib};
     return if $filename !~ m{\.pm$};
 
@@ -28,8 +28,7 @@ sub weave_section {
     $module =~ s{/}{::}g;
     $module =~ s{\.pm$}{};
 
-    print "module:$module\n";
-
+    #print "module:$module\n";
     if ( !Class::Inspector->loaded($module) ) {
         eval { local @INC = ( 'lib', @INC ); Module::Load::load $module };
         print "$@" if $@;    #warn
@@ -110,3 +109,28 @@ this by attempting to compile your class and interrogating its metaclass object.
 Classes which do not have a C<meta> method will be skipped.
 
 It rewrites pod only for *.pm files in lib.
+
+=head1 CAVEAT
+
+=head2 dzil listdeps trouble?
+
+When does this plugin run?
+
+This plugin runs every time you run dzil (as far as I can see; it's probably 
+part of the podweaver plugin so it runs in one of Dist::Zilla's phases). The
+trouble is that it is always run when listdeps executed.
+
+What does it do?
+
+It loads (at runtime) all your packages (classes). To do so it needs all 
+dependencies fulfilled. So basically, it requires that all dependencies 
+have to be fulfilled to run already before you run listdeps. That defeats
+the purpose.
+
+A possible workaround is to move weaver.ini in place only after all 
+requirements have been installed. The trouble is that Dist::Zilla can't do this
+for you since basically listdeps and podweaver run in the same phase. 
+
+Another alternative is to use authordep directive in your dist.ini and install
+missing requirements as authordeps. That works ok, although it is not ideal
+either.
